@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Domoticz in table</title>
+	<!--
+	<link rel="stylesheet" type="text/css" href="easyui/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="easyui/themes/color.css">
+	<link rel="stylesheet" type="text/css" href="easyui/demo/demo.css">
+	<script type="text/javascript" src="easyui/jquery-1.6.min.js"></script>
+	<script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+        <script type="text/javascript" src="easyui/datagrid-filter.js"></script>
+	-->
+        <link rel="stylesheet" type="text/css" href="//www.jeasyui.com/easyui/themes/default/easyui.css">
+        <link rel="stylesheet" type="text/css" href="//www.jeasyui.com/easyui/themes/icon.css">
+        <link rel="stylesheet" type="text/css" href="//www.jeasyui.com/easyui/themes/color.css">
+        <link rel="stylesheet" type="text/css" href="//www.jeasyui.com/easyui/demo/demo.css">
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+        <script type="text/javascript" src="//www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+        <script type="text/javascript" src="//www.jeasyui.com/easyui/datagrid-filter.js"></script> 
+</head>
+<body>
+	<h2>Domoticz in table</h2>
+	<p>Click the buttons on datagrid toolbar to do crud actions.</p>
+	
+	<table id="dg" title="Variables" class="easyui-datagrid" style="width:600px;height:768px"
+			url="json.html?plan=var"
+			toolbar="#toolbar" pagination="false"
+			rownumbers="true" fitColumns="true" singleSelect="true"
+		data-options="singleSelect:true">
+		<thead>
+			<tr>
+				<th field="Name" width="100">Name</th>
+				<th field="idx" width="100" data-options="hidden:true">idx</th>
+				<th field="PlanID" width="100" data-options="hidden:true">idx</th>
+				<th field="LastUpdate" width="50" data-options="hidden:true">LastUpdate</th>
+				<th field="Data" width="100">Data</th>
+				<th field="Level" width="50" data-options="hidden:true">Level</th>
+			</tr>
+		</thead>
+	</table>
+	<div id="toolbar">
+		<!-- <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newDevice()">New Device</a> -->
+		<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editDevice()">Edit Device</a>
+		<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="refreshTable()">Refresh</a>
+		<!-- <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyDevice()">Remove Device</a> -->
+	</div>
+	<table id="dgother" title="Devices" class="easyui-datagrid" style="width:600px;height:768px"
+			url="json.html"
+			toolbar="#toolbar2" pagination="false"
+			rownumbers="true" fitColumns="true" singleSelect="true"
+		data-options="singleSelect:true">
+		<thead>
+			<tr>
+				<th field="Name" width="100">Name</th>
+				<th field="idx" width="100" data-options="hidden:true">idx</th>
+				<th field="PlanID" width="100" data-options="hidden:true">idx</th>
+				<th field="LastUpdate" width="50" data-options="hidden:true">LastUpdate</th>
+				<th field="Data" width="100">Data</th>
+				<th field="Level" width="50" data-options="hidden:true">Level</th>
+			</tr>
+		</thead>
+	</table>
+	<div id="toolbar2">
+		<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="refreshTable2()">Refresh</a>
+	</div>
+	
+	<div id="dlgi" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px"
+			closed="true" buttons="#dlg-buttons">
+		<div class="ftitle">Device Information</div>
+		<form id="fmi" method="post" novalidate>
+			<div class="fitem">
+				<label>Name:</label>
+				<input name="nvalue" class="easyui-textbox" required="true">
+			</div>
+		</form>
+	</div>
+	<div id="dlge" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px"
+			closed="true" buttons="#dlg-edit-buttons">
+		<div class="ftitle">Device Information</div>
+		<form id="fme" method="get" novalidate>
+			<div class="fitem" style="display:none;">
+				<label>Idx:</label>
+				<input name="type" value="command">
+				<input name="param" value="udevice">
+				<input name="idx" class="easyui-textbox" required="true">
+				<input name="nvalue" value="0" class="easyui-textbox" required="true">
+			</div>
+			<div class="fitem">
+				<label>Name:</label>
+				<input name="Name" class="easyui-textbox" required="true" disabled="disabled">
+			</div>
+			<div class="fitem">
+				<label>Value:</label>
+				<input name="svalue" class="easyui-textbox">
+			</div>
+		</form>
+	</div>
+	<div id="dlgswitch" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px"
+			closed="true" buttons="#dlg-swit-buttons">
+		<div class="ftitle">Device Information</div>
+		<form id="fmswitch" method="get" novalidate>
+			<div class="fitem" style="display:none;">
+				<label>Idx:</label>
+				<input name="type" value="command">
+				<input name="param" value="udevice">
+				<input name="idx" class="easyui-textbox" required="true">
+			</div>
+			<div class="fitem">
+				<label>Name:</label>
+				<input name="Name" class="easyui-textbox" required="true" disabled="disabled">
+			</div>
+			<!-- <div class="fitem">
+				<label>Value:</label>
+				<input name="svalue" class="easyui-textbox">
+			</div> -->
+			<div class="fitem">
+				<label>Value:</label>
+				<select name="nvalue" class="easyui-combobox"  style="width:100%;">
+					<option value="1">On</option>
+					<option value="0">Off</option>
+				</select>
+			</div>
+		</form>
+	</div>
+	<div id="dlg-buttons">
+		<a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveDevice()" style="width:90px">Save</a>
+		<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlgi').dialog('close')" style="width:90px">Cancel</a>
+	</div>
+	<div id="dlg-edit-buttons">
+		<a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="updateDevice()" style="width:90px">Update</a>
+		<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlge').dialog('close')" style="width:90px">Cancel</a>
+	</div>
+	<div id="dlg-swit-buttons">
+		<a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="updateSwitch()" style="width:90px">Update</a>
+		<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlgswitch').dialog('close')" style="width:90px">Cancel</a>
+	</div>
+	<script type="text/javascript">
+		var url;
+                function refreshTable(){
+			$('#dg').datagrid('reload');
+ 		}
+                function refreshTable2(){
+			$('#dgother').datagrid('reload');
+ 		}
+		function newDevice(){
+			$('#dlgi').dialog('open').dialog('setTitle','New Device');
+			$('#fmi').form('clear');
+			url = 'save_device.php';
+		}
+		function editDevice(){
+			var row = $('#dg').datagrid('getSelected');
+			if (row){
+			    if(row.PlanID=='3')
+                                if(row.Data=='On' || row.Data=='Off'){ 
+				  $('#dlgswitch').dialog('open').dialog('setTitle','Edit Device');
+				  $('#fmswitch').form('load',row);
+				  url = 'json.html?type=command&param=udevice&idx='+row.idx+'&nvalue='+row.nvalue;
+				} else {
+				  $('#dlge').dialog('open').dialog('setTitle','Edit Device');
+				  $('#fme').form('load',row);
+				  url = 'json.html?type=command&param=udevice&idx='+row.idx+'&nvalue=0&svalue='+row.Data;
+				//url = 'update_device.php?id='+row.id;
+ 				}
+			}
+		}
+		function saveDevice(){
+			$('#fmi').form('submit',{
+				url: url,
+				onSubmit: function(){
+					return $(this).form('validate');
+				},
+				success: function(result){
+					var result = eval('('+result+')');
+					if (result.errorMsg){
+						$.messager.show({
+							title: 'Error',
+							msg: result.errorMsg
+						});
+					} else {
+						$('#dlgi').dialog('close');		// close the dialog
+						$('#dg').datagrid('reload');	// reload the user data
+					}
+				}
+			});
+		}
+		function updateDevice(){
+			$('#fme').form('submit',{
+				url: url,
+				onSubmit: function(){
+					return $(this).form('validate');
+				},
+				success: function(result){
+					var result = eval('('+result+')');
+					if (result.errorMsg){
+						$.messager.show({
+							title: 'Error',
+							msg: result.errorMsg
+						});
+					} else {
+						$('#dlge').dialog('close');		// close the dialog
+						$('#dg').datagrid('reload');	// reload the user data
+					}
+				}
+			});
+		}
+		function updateSwitch(){
+			$('#fmswitch').form('submit',{
+				url: url,
+				onSubmit: function(){
+					return $(this).form('validate');
+				},
+				success: function(result){
+					var result = eval('('+result+')');
+					if (result.errorMsg){
+						$.messager.show({
+							title: 'Error',
+							msg: result.errorMsg
+						});
+					} else {
+						$('#dlgswitch').dialog('close');		// close the dialog
+						$('#dg').datagrid('reload');	// reload the user data
+					}
+				}
+			});
+		}
+		function destroyDevice(){
+			var row = $('#dg').datagrid('getSelected');
+			if (row){
+				$.messager.confirm('Confirm','Are you sure you want to destroy this user?',function(r){
+					if (r){
+						$.post('destroy_device.php',{id:row.id},function(result){
+							if (result.success){
+								$('#dg').datagrid('reload');	// reload the user data
+							} else {
+								$.messager.show({	// show error message
+									title: 'Error',
+									msg: result.errorMsg
+								});
+							}
+						},'json');
+					}
+				});
+			}
+		}
+        $(function(){
+            var dg = $('#dg').datagrid();
+            dg.datagrid('enableFilter', [{field:'Name',type:'textbox'}]);
+            var dgother = $('#dgother').datagrid();
+            dgother.datagrid('enableFilter', [{field:'Name',type:'textbox'}]);
+        });
+	</script>
+	<style type="text/css">
+		#fm{
+			margin:0;
+			padding:10px 30px;
+		}
+		.ftitle{
+			font-size:14px;
+			font-weight:bold;
+			padding:5px 0;
+			margin-bottom:10px;
+			border-bottom:1px solid #ccc;
+		}
+		.fitem{
+			margin-bottom:5px;
+		}
+		.fitem label{
+			display:inline-block;
+			width:80px;
+		}
+		.fitem input{
+			width:160px;
+		}
+	</style>
+</body>
+</html>
